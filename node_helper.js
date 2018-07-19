@@ -56,10 +56,15 @@ module.exports = NodeHelper.create({
         var screenKey = self.verifyScreenKey();
         if(screenKey){
 
+            emails = {};
+            self.config.users.forEach(email => {
+                emails[email.replace(/\./g, '+','g')] = true;
+            });
+
             var data = {
                 name: self.config.name,
                 secret: screenKey,
-                emails: self.config.users
+                emails: emails
             };
 
             request({
