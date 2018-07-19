@@ -1,0 +1,24 @@
+.border_bottom td{
+    border-bottom: 1pt solid #444444;
+}
+
+.border_top td{
+    border-top: 1pt solid #444444;
+}
+
+td {
+    padding-right: 5px;
+}
+
+table {
+    width: 100%;
+}
+
+.message-message {
+    width: 100%;
+}
+
+.message-from {
+    white-space: nowrap;
+    padding-right: 15px;
+}
