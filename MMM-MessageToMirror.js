@@ -6,7 +6,8 @@ Module.register("MMM-MessageToMirror",{
     getScripts: function() {
         return [
             this.file('node_modules/firebase-admin/lib/firestore/firestore.js'),
-            this.file('node_modules/firebase/firebase.js')
+            this.file('node_modules/firebase/firebase.js'),
+            this.file('firebase-config.js')
             // 'firestore.js'
         ];
     },
@@ -39,7 +40,8 @@ Module.register("MMM-MessageToMirror",{
 
         // console.log(this.name + ': getDom')
         console.log(this.name + ': Getting data');
-        db.collection("messages").onSnapshot((querySnapshot) => {
+        path = "screens/" + this.config.screenKey + "/messages";
+        db.collection(path).onSnapshot((querySnapshot) => {
             self.messages = [];
             querySnapshot.forEach((doc) => {
                 console.log('Innhold: ' + doc.data().message);
@@ -58,15 +60,8 @@ Module.register("MMM-MessageToMirror",{
 	},
     
     openFirestoreConnection: function() {
-        var config = {
-            apiKey: "AIzaSyA_PsBPYYqDg203bHfUmZPEDUxgbBtFPkY",
-            authDomain: "magic-acf51.firebaseapp.com",
-            databaseURL: "https://magic-acf51.firebaseio.com",
-            projectId: "magic-acf51",
-            storageBucket: "magic-acf51.appspot.com",
-            messagingSenderId: "4501297937"
-        };
-        firebase.initializeApp(config);
+        // var config = firebase-config.firebaseConfig;
+        firebase.initializeApp(firebaseConfig);
 
     },
 

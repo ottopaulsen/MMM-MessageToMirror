@@ -2,3 +2,5 @@
 t.js
 t?.js
 node_modules/
+firebase-config.js
+.oldgit/
