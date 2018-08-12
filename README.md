@@ -1,5 +1,7 @@
 # Message to mirror
 
+NB! This is not finished!
+
 This is the MMM-MessageToMirror module, which is a module for MagicMirror. See my [magic](https://github.com/ottopaulsen/magic) repository for more information.
 
 ![Screenshot](doc/screenshot.png)
