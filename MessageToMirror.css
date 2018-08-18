@@ -20,5 +20,10 @@ table {
 
 .message-from {
     white-space: nowrap;
+    padding-right: 2px;
+}
+
+.message-time {
+    white-space: nowrap;
     padding-right: 15px;
 }
