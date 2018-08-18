@@ -21,7 +21,6 @@ Module.register("MMM-MessageToMirror",{
         users: []
     },
 
-
 	start: function() {
         console.log(this.name + ' started.');
 
@@ -58,6 +57,9 @@ Module.register("MMM-MessageToMirror",{
             });
             this.updateDom(1000);
         });
+        setInterval(function(){
+            self.updateDom(100);
+        }, 5000);
     },
 
     removeOldMessages: function(self) {
@@ -81,7 +83,7 @@ Module.register("MMM-MessageToMirror",{
 
     calculateAge: function(time) {
         const sec = Math.round((Date.now() - time.getTime()) / 1000)
-        if(sec < 60) return 'now'
+        if(sec < 45) return 'now'
         const min = Math.round(sec / 60)
         if(min < 60) return min + ' min'
         const h = Math.round(min / 60)
