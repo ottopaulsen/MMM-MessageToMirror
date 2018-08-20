@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "Show messages on mirror",
   "author": "Otto Paulsen",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ottopaulsen/MMM-MessageToMirror.git"
+  },
+  "license" : "See license in LICENSE file" ,
   "dependencies": {
-    "crypto": "^1.0.1",
     "firebase": "^5.0.4",
     "firebase-admin": "^5.12.1",
     "replace-in-file": "^3.4.0",
