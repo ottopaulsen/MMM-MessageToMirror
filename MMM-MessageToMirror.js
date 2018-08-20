@@ -108,7 +108,7 @@ Module.register("MMM-MessageToMirror",{
         self = this;
     
         if (this.messages.length === 0) {
-            wrapper.innerHTML = (self.loaded) ? this.translate("EMPTY") : this.translate("LOADING");
+            wrapper.innerHTML = (self.loaded) ? this.translate("EMPTY") : '';
             wrapper.className = "small dimmed";
             console.log(this.name + ': No values');
             return wrapper;
