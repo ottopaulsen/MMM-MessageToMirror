@@ -8,7 +8,6 @@ Module.register("MMM-MessageToMirror",{
             this.file('node_modules/firebase-admin/lib/firestore/firestore.js'),
             this.file('node_modules/firebase/firebase.js'),
             this.file('firebase-config.js')
-            // 'firestore.js'
         ];
     },
 
@@ -18,7 +17,8 @@ Module.register("MMM-MessageToMirror",{
         database: '',
         functions: '',
         screenKey: '',
-        users: []
+        users: [],
+        newMessageSound: 'newmessage.wav',
     },
 
 	start: function() {
@@ -52,14 +52,22 @@ Module.register("MMM-MessageToMirror",{
                         sentBy: doc.data().sentBy,
                         validMinutes: validMinutes
                     });
-                    setTimeout(this.removeOldMessages, validTime, this);
+                    setTimeout(self.removeOldMessages, validTime, self);
                 }
             });
-            this.updateDom(1000);
+            self.messages.length > 0 ? self.playSound(self.config.newMessageSound) : null;
+            self.updateDom(1000);
         });
         setInterval(function(){
-            self.updateDom(100);
+            self.updateDom();
         }, 5000);
+    },
+
+    playSound: function(soundfile) {
+        const sound = document.createElement('audio');
+        sound.src = this.file(soundfile);
+        sound.loop = false;
+        sound.play();
     },
 
     removeOldMessages: function(self) {
@@ -69,7 +77,7 @@ Module.register("MMM-MessageToMirror",{
                 arr.splice(i, 1);
             }
         })
-        self.updateDom(1000);
+        self.updateDom();
     },
     
 	openMessageToMirrorConnection: function() { 
@@ -91,7 +99,6 @@ Module.register("MMM-MessageToMirror",{
         const d = Math.round(h / 24)
         return d + ' days'
     },
-
 
     getStyles: function() {
         return [
