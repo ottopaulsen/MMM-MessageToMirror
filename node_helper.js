@@ -78,7 +78,7 @@ module.exports = NodeHelper.create({
                 if(err) {
                     console.log(self.name + ': Error registering screen: ', err);
                 } else {
-                    console.log(self.name + ': Screen registered');
+                    console.log(self.name + ': Screen registered: ', self.config.name);
                 }
             });
         };
@@ -96,12 +96,28 @@ module.exports = NodeHelper.create({
 
             self.loaded = true;
             self.options = {};
+		} else if (notification === 'MESSAGETOMIRROR_SEND_RECEIPT') {
+            ref = payload;
+            self.sendReceipt(ref);
+        }
+    },
 
-            // messages[0] = "Loading messages..."
-
-            // self.sendSocketNotification('MESSAGETOMIRROR_PAYLOAD', {
-            //     messages: messages
-            // });
-		}
-	},        
+    sendReceipt: function(path) {
+        console.log('Sending receipt for ', path)
+        self = this;
+        request({
+            headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+            },
+            uri: self.config.functions + '/receipts',
+            method: 'POST',
+            body: JSON.stringify({messagePath: path})
+        }, function(err, res, body){
+            if(err) {
+                console.log(self.name + ': Error sending receipt: ', err);
+            } else {
+                console.log(self.name + ': Receipt sent');
+            }
+        });
+    },    
 });

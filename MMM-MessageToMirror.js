@@ -54,6 +54,11 @@ Module.register("MMM-MessageToMirror",{
                     });
                     setTimeout(self.removeOldMessages, validTime, self);
                 }
+                console.log('Checking for receipt for ', doc.data())
+                if(!doc.data().receipt) {
+                    console.log('Sending receipt')
+                    self.sendReceipt(doc.ref)
+                }
             });
             self.messages.length > 0 ? self.playSound(self.config.newMessageSound) : null;
             self.updateDom(1000);
@@ -67,6 +72,7 @@ Module.register("MMM-MessageToMirror",{
         const sound = document.createElement('audio');
         sound.src = this.file(soundfile);
         sound.loop = false;
+        sound.volume = 1.0;
         sound.play();
     },
 
@@ -84,9 +90,13 @@ Module.register("MMM-MessageToMirror",{
         this.sendSocketNotification('MESSAGETOMIRROR_CONFIG', this.config);
 	},
     
+	sendReceipt: function(ref) { 
+        console.log('Sending MESSAGETOMIRROR_SEND_RECEIPT socket notification for ', ref.path)
+        this.sendSocketNotification('MESSAGETOMIRROR_SEND_RECEIPT', ref.path);
+	},
+    
     openFirestoreConnection: function() {
         firebase.initializeApp(firebaseConfig);
-
     },
 
     calculateAge: function(time) {
