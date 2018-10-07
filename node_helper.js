@@ -4,86 +4,79 @@ var NodeHelper = require("node_helper");
 const fs = require("fs");
 const replace = require('replace-in-file');
 
-const defaultScreenKey = 'MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP';
-
 module.exports = NodeHelper.create({
 
 	start: function() {
-		console.log('Starting node helper for: ' + this.name);
+		console.log(this.name + ': Starting node_helper');
         this.loaded = false;
     },
 
-    replaceInConfigFile: function(oldText, newText){
-        // Replaces text in config file.
-        var self = this;
-        var configFilename = __dirname + "/../../config/config.js";
-        const options = {
-            files: configFilename,
-            from: oldText,
-            to: newText,
-        };        
+    getScreenKey: function(config) {
+        var path = this.path + '/keys';      
+        var filename = path + '/' + config.name.replace(' ', '_') + '.key';
 
-        replace(options)
-        .then(changes => {
-            console.log(self.name + ': Screen key saved to config file');
-        })
-        .catch(error => {
-            console.error(self.name + ': Error saving screen key to config file: ', error);
-        });
-    },
-
-    verifyScreenKey: function() {
-        var screenKey = this.config.screenKey;
-
-        if (!screenKey) {
-            console.error(this.name + ': ERROR: screenKey missing in config file.');
-            return '';
+        if (!fs.existsSync(path)) {
+            console.log(this.name + ': Creating directory for screen key files: ', path);
+            fs.mkdirSync(path);
         }
-        if (screenKey == defaultScreenKey) {
-            console.log(this.name + ': Generating new screen key');
+
+        if (fs.existsSync(filename)) {
+            screenKey = fs.readFileSync(filename, {encoding: 'utf8'});
+            console.log(this.name + ': Found screen key: ' + screenKey);
+        } else {
+            console.log(this.name + ': Generating new screen key file: ', filename);
             screenKey = uuidv4();
-            this.replaceInConfigFile(defaultScreenKey, screenKey);
+            fs.writeFileSync(filename, screenKey);
         }
         
         return screenKey;
     },
 
-    registerScreen: function() {
+    registerScreen: function(config) {
         var self = this;
 
-        console.log('Registering screen');
+        console.log(this.name + ': Registering screen ', config.name);
 
-        var screenKey = self.verifyScreenKey();
+        var screenKey = self.getScreenKey(config);
         if(screenKey){
 
             users = {};
-            self.config.users.forEach(user => {
+            config.users.forEach(user => {
                 users[user.email.replace(/\./g, '+','g')] = user.name;
             });
 
             var data = {
-                name: self.config.name,
+                name: config.name,
                 secret: screenKey,
                 users: users
             };
+
+            console.log('Registering screen on ', config.functions + '/screens' + '. Data = ', data);
 
             request({
                 headers: {
                 'Content-Type': 'application/json; charset=utf-8'
                 },
-                uri: self.config.functions + '/screens',
+                uri: config.functions + '/screens',
                 method: 'POST',
                 body: JSON.stringify(data)
             }, function(err, res, body){
                 if(err) {
-                    console.log(self.name + ': Error registering screen: ', err);
+                    console.error(self.name + ': Error registering screen: ', err);
                 } else {
-                    console.log(self.name + ': Screen registered: ', self.config.name);
+                    console.log(self.name + ': Screen registered: ', config.name);
                 }
             });
+
+            this.sendScreenKey(config.name, screenKey);
         };
 
 
+    },
+
+    sendScreenKey: function(name, screenKey) {
+        console.log(this.name + ': Sending screen key ' + screenKey + ' to ' + name);
+        this.sendSocketNotification('SCREENKEY', {name: name, screenKey: screenKey});
     },
 
 	socketNotificationReceived: function(notification, payload) {
@@ -91,8 +84,9 @@ module.exports = NodeHelper.create({
 
 		if (notification === 'MESSAGETOMIRROR_CONFIG') {
             self.config = payload;
+            config = payload;
 
-            self.registerScreen();
+            self.registerScreen(config);
 
             self.loaded = true;
             self.options = {};
@@ -114,7 +108,7 @@ module.exports = NodeHelper.create({
             body: JSON.stringify({messagePath: path})
         }, function(err, res, body){
             if(err) {
-                console.log(self.name + ': Error sending receipt: ', err);
+                console.error(self.name + ': Error sending receipt: ', err);
             } else {
                 console.log(self.name + ': Receipt sent');
             }
