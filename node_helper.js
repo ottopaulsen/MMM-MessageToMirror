@@ -2,7 +2,6 @@ var request = require('request');
 var uuidv4 = require('uuid/v4');
 var NodeHelper = require("node_helper");
 const fs = require("fs");
-const replace = require('replace-in-file');
 
 module.exports = NodeHelper.create({
 

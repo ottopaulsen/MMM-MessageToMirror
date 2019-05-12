@@ -22,13 +22,6 @@ Module.register("MMM-MessageToMirror", {
         showTime: true
     },
 
-    // getScreenKey: function () {
-    //     if (!this.screenKey) {
-    //         console.error(this.name + ': Missing screenKey');
-    //     }
-    //     return this.screenKey;
-    // },
-
     start: function () {
         console.log(this.name + ' started. Id: ', this.identifier);
         var self = this;
