@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git@github.com:ottopaulsen/MMM-MessageToMirror.git"
   },
-  "license" : "See license in LICENSE file" ,
+  "license" : "MIT" ,
   "dependencies": {
     "firebase": "^5.0.4",
     "firebase-admin": "^5.12.1",
