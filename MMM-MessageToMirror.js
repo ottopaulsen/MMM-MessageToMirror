@@ -5,8 +5,10 @@ Module.register("MMM-MessageToMirror", {
 
     getScripts: function () {
         return [
-            this.file('node_modules/firebase-admin/lib/firestore/firestore.js'),
-            this.file('node_modules/firebase/firebase.js'),
+            // this.file('node_modules/firebase-admin/lib/firestore/firestore.js'),
+            this.file('node_modules/firebase/firebase-app.js'),
+            this.file('node_modules/firebase/firebase-auth.js'),
+            this.file('node_modules/firebase/firebase-firestore.js'),
             this.file('firebase-config.js')
         ];
     },
@@ -45,7 +47,7 @@ Module.register("MMM-MessageToMirror", {
             .orderBy('sentTime', 'desc').onSnapshot((querySnapshot) => {
                 self.messages = [];
                 querySnapshot.forEach((doc) => {
-                    sentTime = new Date(doc.data().sentTime);
+                    sentTime = doc.data().sentTime.toDate();
                     validMinutes = Number(doc.data().validMinutes);
                     validTime = sentTime.getTime() + validMinutes * 60 * 1000 - Date.now();
                     validTime = validTime > 0 ? validTime : 0;
