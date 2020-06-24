@@ -154,7 +154,9 @@ module.exports = NodeHelper.create({
       this.scrollerChild = spawn(
         'python3',
         [
-          '/Users/otto/dev/magic/MagicMirror/modules/MMM-MessageToMirror/test-scroller.py'
+          this.config.testScroller
+            ? 'modules/MMM-MessageToMirror/test-scroller.py'
+            : 'modules/MMM-MessageToMirror/scroller.py'
         ],
         { stdio: ['ignore', 'pipe', process.stderr] }
       )
@@ -183,7 +185,9 @@ module.exports = NodeHelper.create({
 
     function scroll (browserWindow, direction) {
       browserWindow.webContents
-        .executeJavaScript('window.scrollBy(0, ' + direction * 5 + ')')
+        .executeJavaScript(
+          'window.scrollBy(0, ' + direction * self.config.scrollSpeed + ')'
+        )
         .then(null)
         .catch(error => {
           console.log(self.name + ': Scroll error: ', error)
@@ -194,7 +198,13 @@ module.exports = NodeHelper.create({
       let scrollInterval = null
       for await (const line of chunksToLinesAsync(input)) {
         const distance = chomp(line)
-        const direction = distance < 15 ? -1 : distance < 30 ? 1 : 0
+        const rev = self.config.reverseScrolling ? -1 : 1
+        const direction =
+          distance < self.config.scrollUpCm
+            ? -rev
+            : distance < self.config.scrollDownCm
+            ? rev
+            : 0
         console.log(self.name + ': Distance: ' + distance)
         console.log(self.name + ': Direction: ' + direction)
         clearInterval(scrollInterval)

@@ -20,7 +20,12 @@ Module.register('MMM-MessageToMirror', {
     newMessageSound: 'newmessage.wav',
     showSender: true,
     showTime: true,
-    urlTimeoutSeconds: 30
+    urlTimeoutSeconds: 3600,
+    testScroller: false,
+    scrollSpeed: 5,
+    scrollUpCm: 15,
+    scrollDownCm: 30,
+    reverseScrolling: false
   },
 
   start: function () {
