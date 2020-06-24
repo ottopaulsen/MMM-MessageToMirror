@@ -16,12 +16,11 @@ Go to `MagicMirror/modules` and write
     cd MMM-MessageToMirror
     npm install
 
-
 ## Configuration
 
 This is the default configuration with description. Put it in the `MagicMirror/config/config.js`:
 
-``` json
+```json
                 {
                 	module: 'MMM-MessageToMirror',
                     position: 'middle_center',
@@ -43,7 +42,7 @@ This is the default configuration with description. Put it in the `MagicMirror/c
 
 The `name` comes up in the app. You can use it to select between multiple mirrors.
 
-The `database` is the name of the Firestore database you are using. 
+The `database` is the name of the Firestore database you are using.
 
 The `functions` is the URI to the server code.
 
@@ -55,7 +54,16 @@ You may change the sound used for new messages by changing the newMessageSound f
 
 See [magic-message](https://github.com/ottopaulsen/magic-message) for more details on the server and app code.
 
+### Setting up for displaying web pages
+
+The module can be used to send a web page from your laptop (or maybe mobile phone) to the screen and get it displayed there. For this to work, you need to share the url of the page you want to display to `https://magic.smoky.no/screens/0`. This will open the SendMessageToMirror app, where you must be logged in. The page will immediately be sent to the screen.
+
+NB! If you have multiple screens, the '0' in the URL may be changed to send to the right screen.
+
+One way to set up sharing is to add a share tool that allows you to share a web page by sending it to a URL. In Chrome, for example, the [AddToAny](https://chrome.google.com/webstore/detail/addtoany-share-anywhere/ffpgijchhhkhnokafdeklpllijgnbche) plugin does the job.
+
+Configure the AddToAny plugin or other sharing tool to share the current web page with the following url:
+
 ## Licensed content
 
 The default sound file for new messages, ´newmessage.wav´, is a copy of dingding.wav by ljudman, downloaded from [freesound.org](https://freesound.org/s/33244/)
-
