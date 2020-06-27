@@ -64,6 +64,24 @@ One way to set up sharing is to add a share tool that allows you to share a web 
 
 Configure the AddToAny plugin or other sharing tool to share the current web page with the following url:
 
+```
+https://magic.smoky.no/screens/<screen_number>
+```
+
+#### Scrolling
+
+To scroll the web page, you may connect a `HC-SR04` distance sensor to your Raspberry Pi. Connect it following [these instructions](https://tutorials-raspberrypi.com/raspberry-pi-ultrasonic-sensor-hc-sr04/).
+Hold your hand close to the sensor to scroll up, medium distance to scroll down. No hand to not scroll. Here is the configuration for the sensor:
+
+| Parameter         | Default | Description                                                                     |
+| ----------------- | ------- | ------------------------------------------------------------------------------- |
+| urlTimeoutSeconds | 3600    | Time in seconds before the browser is closed. This timer resets when scrolling. |
+| testScroller      | false   | Set to true to test scrolling without the sensor                                |
+| scrollSpeed       | 5       | Number of pixels scrolled each time                                             |
+| scrollUpCm        | 15      | Hold your hand closer then this number of cm to scroll up                       |
+| scrollDownCm      | 30      | Hold your hand closer then this number of cm to scroll down                     |
+| reverseScrolling  | false   | Set to true to reverse the scroll direction                                     |
+
 ## Licensed content
 
 The default sound file for new messages, ´newmessage.wav´, is a copy of dingding.wav by ljudman, downloaded from [freesound.org](https://freesound.org/s/33244/)
