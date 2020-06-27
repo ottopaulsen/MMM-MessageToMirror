@@ -35,9 +35,6 @@ Module.register('MMM-MessageToMirror', {
     setInterval(function () {
       self.updateDom()
     }, 5000)
-    setTimeout(function () {
-      self.openUrl('https://vg.no')
-    }, 2000)
   },
 
   openUrl: function (url) {
