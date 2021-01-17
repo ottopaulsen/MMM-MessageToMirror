@@ -3,7 +3,7 @@ const uuidv4 = require('uuid/v4')
 const NodeHelper = require('node_helper')
 const fs = require('fs')
 const { BrowserWindow } = require('electron')
-const { chunksToLinesAsync, chomp } = require('@rauschma/stringio')
+const scroller = require("./scroller")
 
 module.exports = NodeHelper.create({
   start: function () {
@@ -11,11 +11,12 @@ module.exports = NodeHelper.create({
     this.loaded = false
   },
 
-  scrollerChild: null,
   browserWindow: null,
-
+  
   stop: function () {
-    this.scrollerChild.kill()
+    if (this.scroller) {
+      this.scroller.close()
+    }
   },
 
   getScreenKey: function (config) {
@@ -101,10 +102,7 @@ module.exports = NodeHelper.create({
 
     if (notification === 'MESSAGETOMIRROR_CONFIG') {
       self.config = payload
-      config = payload
-
-      self.registerScreen(config)
-
+      self.registerScreen(payload)
       self.loaded = true
       self.options = {}
     } else if (notification === 'MESSAGETOMIRROR_SEND_RECEIPT') {
@@ -128,7 +126,7 @@ module.exports = NodeHelper.create({
         method: 'POST',
         body: JSON.stringify({ messagePath: path })
       },
-      function (err, res, body) {
+      function (err) {
         if (err) {
           console.error(self.name + ': Error sending receipt: ', err)
         } else {
@@ -141,52 +139,30 @@ module.exports = NodeHelper.create({
   openUrl: async function (url) {
     console.log(this.name + ': Opening URL: ', url)
     const self = this
-    if (!this.browserWindow) {
-      console.log(this.name + ': Opening new browser window')
-      this.browserWindow = new BrowserWindow({ fullscreen: true })
-    }
-    this.browserWindow.loadURL(url)
-
-    if (!this.scrollerChild) {
-      const { spawn } = require('child_process')
-
-      console.log(this.name + ': Spawning scroller child process')
-      this.scrollerChild = spawn(
-        'python3',
-        [
-          this.config.testScroller
-            ? 'modules/MMM-MessageToMirror/test-scroller.py'
-            : 'modules/MMM-MessageToMirror/scroller.py'
-        ],
-        { stdio: ['ignore', 'pipe', process.stderr] }
-      )
-
-      this.scrollerChild.on('exit', function (code, signal) {
-        console.log(
-          this.name +
-            ': Scroller exited with ' +
-            `code ${code} and signal ${signal}`
-        )
-      })
-
-      this.scrollerChild.on('error', function (error) {
-        console.log(this.name + ': Scroller error: ' + error)
-      })
-    }
+    let switchCount = 0;
 
     function closeBrowser () {
       console.log(self.name + ': Closing browser window')
       self.browserWindow.close()
+      scroller.setRotaryHandler(null)
+      scroller.setSwitchHandler(null)
     }
 
-    const inactivityTimeout = this.config.urlTimeoutSeconds * 1000
-    clearTimeout(this.browserTimeout)
-    this.browserTimeout = setTimeout(closeBrowser, inactivityTimeout)
+    function switchClicked() {
+      switchCount++;
+      if (switchCount === 3) {
+        closeBrowser()
+      }
+      setTimeout(() => {
+        switchCount = 0
+      }, 3000)
+    }
 
-    function scroll (browserWindow, direction) {
-      browserWindow.webContents
+    function scroll (direction) {
+      self.browserWindow.webContents
         .executeJavaScript(
-          'window.scrollBy(0, ' + direction * self.config.scrollSpeed + ')'
+          'window.scrollBy(0, ' + direction * 5 * self.config.scrollSpeed + ')',
+          true
         )
         .then(null)
         .catch(error => {
@@ -194,34 +170,20 @@ module.exports = NodeHelper.create({
         })
     }
 
-    async function browserControl (input, browserWindow) {
-      let scrollInterval = null
-      for await (const line of chunksToLinesAsync(input)) {
-        const distance = chomp(line)
-        const rev = self.config.reverseScrolling ? -1 : 1
-        const direction =
-          distance < self.config.scrollUpCm
-            ? -rev
-            : distance < self.config.scrollDownCm
-            ? rev
-            : 0
-        console.log(self.name + ': Distance: ' + distance)
-        console.log(self.name + ': Direction: ' + direction)
-        clearInterval(scrollInterval)
-        if (direction) {
-          clearTimeout(self.browserTimeout)
-          self.browserTimeout = setTimeout(closeBrowser, inactivityTimeout)
-          scroll(browserWindow, direction)
-          scrollInterval = setInterval(() => {
-            scroll(browserWindow, direction)
-          }, 20)
-        }
-      }
+    if (!this.browserWindow) {
+      console.log(this.name + ': Opening new browser window')
+      this.browserWindow = new BrowserWindow({ fullscreen: true })
+      this.browserWindow.on('close', () => {
+        this.browserWindow = null
+      })
     }
 
-    console.log(this.name + ': Starting browserControl')
-    await browserControl(this.scrollerChild.stdout, this.browserWindow)
+    this.browserWindow.loadURL(url)
+    scroller.setRotaryHandler(scroll)
+    scroller.setSwitchHandler(switchClicked)
 
-    console.log(this.name + ': Reading scroller done')
+    const inactivityTimeout = this.config.urlTimeoutSeconds * 1000
+    clearTimeout(this.browserTimeout)
+    this.browserTimeout = setTimeout(closeBrowser, inactivityTimeout)
   }
 })

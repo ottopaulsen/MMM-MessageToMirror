@@ -5,3 +5,4 @@ node_modules/
 firebase-config.js
 .oldgit/
 keys/
+scroller.py
