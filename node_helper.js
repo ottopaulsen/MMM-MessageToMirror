@@ -3,7 +3,11 @@ const uuidv4 = require('uuid/v4')
 const NodeHelper = require('node_helper')
 const fs = require('fs')
 const { BrowserWindow } = require('electron')
-const scroller = require("./scroller")
+const isPi = require('detect-rpi');
+
+if (isPi()) {
+  const scroller = require("./scroller")
+}
 
 module.exports = NodeHelper.create({
   start: function () {

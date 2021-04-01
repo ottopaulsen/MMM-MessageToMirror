@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@rauschma/stringio": "^1.4.0",
+    "detect-rpi": "^1.4.0",
     "firebase": "^6.6.1",
     "replace-in-file": "^3.4.0",
     "rng": "^0.2.2",
