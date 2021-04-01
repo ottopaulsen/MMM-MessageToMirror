@@ -2,17 +2,12 @@ const request = require('request')
 const uuidv4 = require('uuid/v4')
 const NodeHelper = require('node_helper')
 const fs = require('fs')
-const { BrowserWindow } = require('electron')
-const { chunksToLinesAsync, chomp } = require('@rauschma/stringio')
 
 module.exports = NodeHelper.create({
   start: function () {
     console.log(this.name + ': Starting node_helper')
     this.loaded = false
   },
-
-  scrollerChild: null,
-  browserWindow: null,
 
   stop: function () {
     this.scrollerChild.kill()
