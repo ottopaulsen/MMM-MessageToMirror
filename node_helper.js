@@ -2,11 +2,8 @@ const request = require('request')
 const uuidv4 = require('uuid/v4')
 const NodeHelper = require('node_helper')
 const fs = require('fs')
-<<<<<<< HEAD
-=======
 const { BrowserWindow } = require('electron')
 const scroller = require("./scroller")
->>>>>>> 5e42955a7046a762ef01174fc93244e5f14f66cc
 
 module.exports = NodeHelper.create({
   start: function () {
@@ -14,11 +11,8 @@ module.exports = NodeHelper.create({
     this.loaded = false
   },
 
-<<<<<<< HEAD
-=======
   browserWindow: null,
   
->>>>>>> 5e42955a7046a762ef01174fc93244e5f14f66cc
   stop: function () {
     if (this.scroller) {
       this.scroller.close()
