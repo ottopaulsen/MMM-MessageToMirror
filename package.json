@@ -11,9 +11,9 @@
   "dependencies": {
     "@rauschma/stringio": "^1.4.0",
     "detect-rpi": "^1.4.0",
-    "firebase": "^6.6.1",
-    "replace-in-file": "^3.4.0",
+    "firebase": "^9.15.0",
+    "replace-in-file": "^6.3.5",
     "rng": "^0.2.2",
-    "uuid": "^3.3.2"
+    "uuid": "^9.0.0"
   }
 }
