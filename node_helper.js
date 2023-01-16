@@ -6,7 +6,8 @@ const { BrowserWindow } = require("electron");
 const isPi = require("detect-rpi");
 
 if (isPi()) {
-  const scroller = require("./scroller");
+  // Trouble with epoll not being up to date
+  //const scroller = require("./scroller");
 }
 
 module.exports = NodeHelper.create({
