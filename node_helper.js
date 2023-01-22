@@ -4,6 +4,7 @@ const NodeHelper = require("node_helper");
 const fs = require("fs");
 const { BrowserWindow } = require("electron");
 const isPi = require("detect-rpi");
+const { exec } = require("child_process");
 
 if (isPi()) {
   // Trouble with epoll not being up to date
@@ -118,6 +119,8 @@ module.exports = NodeHelper.create({
     } else if (notification === "MESSAGETOMIRROR_URL") {
       url = payload;
       self.openUrl(url);
+    } else if (notification === "MESSAGETOMIRROR_BELL") {
+      self.playBell();
     }
   },
 
@@ -141,6 +144,11 @@ module.exports = NodeHelper.create({
         }
       }
     );
+  },
+
+  playBell: function () {
+    console.log("Playing bell");
+    exec("omxplayer ./newmessage.wav");
   },
 
   openUrl: async function (url) {
