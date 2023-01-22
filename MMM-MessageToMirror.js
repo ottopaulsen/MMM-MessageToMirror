@@ -97,6 +97,7 @@ Module.register("MMM-MessageToMirror", {
   playSound: function (soundfile) {
     const sound = document.createElement("audio");
     sound.src = this.file(soundfile);
+    sound.setAttribute("autoplay", true);
     sound.loop = false;
     sound.volume = 1.0;
     sound.play();
