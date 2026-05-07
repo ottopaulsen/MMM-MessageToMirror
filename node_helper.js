@@ -1,4 +1,3 @@
-const request = require("request");
 const { v4: uuidv4 } = require("uuid");
 const NodeHelper = require("node_helper");
 const fs = require("fs");
@@ -73,23 +72,22 @@ module.exports = NodeHelper.create({
         data
       );
 
-      request(
-        {
-          headers: {
-            "Content-Type": "application/json; charset=utf-8"
-          },
-          uri: config.functions + "/screens",
+      fetch(config.functions + "/screens", {
           method: "POST",
+          headers: { "Content-Type": "application/json; charset=utf-8" },
           body: JSON.stringify(data)
-        },
-        function (err, res, body) {
-          if (err) {
-            console.error(self.name + ": Error registering screen: ", err);
-          } else {
-            console.log(self.name + ": Screen registered: ", config.name);
+        })
+        .then((res) => {
+          if (!res.ok) {
+            return res.text().then((body) => {
+              console.warn(self.name + ": Screen registration returned HTTP " + res.status + " (screen may already be registered): " + body);
+            });
           }
-        }
-      );
+          console.log(self.name + ": Screen registered: ", config.name);
+        })
+        .catch((err) => {
+          console.warn(self.name + ": Could not reach registration endpoint: ", err.message);
+        });
 
       this.sendScreenKey(config.name, screenKey);
     }
@@ -127,23 +125,18 @@ module.exports = NodeHelper.create({
   sendReceipt: function (path) {
     console.log("Sending receipt for ", path);
     const self = this;
-    request(
-      {
-        headers: {
-          "Content-Type": "application/json; charset=utf-8"
-        },
-        uri: self.config.functions + "/receipts",
-        method: "POST",
-        body: JSON.stringify({ messagePath: path })
-      },
-      function (err) {
-        if (err) {
-          console.error(self.name + ": Error sending receipt: ", err);
-        } else {
-          console.log(self.name + ": Receipt sent");
-        }
-      }
-    );
+    fetch(self.config.functions + "/receipts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({ messagePath: path })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        console.log(self.name + ": Receipt sent");
+      })
+      .catch((err) => {
+        console.error(self.name + ": Error sending receipt: ", err.message);
+      });
   },
 
   playBell: function () {

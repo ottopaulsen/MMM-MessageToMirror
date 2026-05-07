@@ -3,10 +3,8 @@ Module.register("MMM-MessageToMirror", {
 
   getScripts: function () {
     return [
-      // this.file('node_modules/firebase-admin/lib/firestore/firestore.js'),
-      this.file("node_modules/firebase/firebase-app.js"),
-      this.file("node_modules/firebase/firebase-auth.js"),
-      this.file("node_modules/firebase/firebase-firestore.js"),
+      this.file("node_modules/firebase/firebase-app-compat.js"),
+      this.file("node_modules/firebase/firebase-firestore-compat.js"),
       this.file("firebase-config.js")
     ];
   },

@@ -9,11 +9,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@rauschma/stringio": "^1.4.0",
-    "detect-rpi": "^1.4.0",
-    "firebase": "^8.10.1",
-    "replace-in-file": "^6.3.5",
-    "rng": "^0.2.2",
-    "uuid": "^9.0.0"
+    "detect-rpi": "^1.5.0",
+    "firebase": "^12.13.0",
+    "uuid": "^9.0.1"
   }
 }
