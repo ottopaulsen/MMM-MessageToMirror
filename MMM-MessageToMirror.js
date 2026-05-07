@@ -88,9 +88,10 @@ Module.register("MMM-MessageToMirror", {
             self.sendReceipt(doc.ref);
           }
         });
-        self.messages.length > 0
-          ? self.playSound(self.config.newMessageSound)
-          : null;
+        const hasNewMessages = querySnapshot.docChanges().some(
+          (change) => change.type === "added"
+        );
+        if (hasNewMessages) self.playSound(self.config.newMessageSound);
         self.updateDom(1000);
       });
   },

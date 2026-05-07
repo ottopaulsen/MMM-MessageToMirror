@@ -38,7 +38,7 @@ module.exports = NodeHelper.create({
     }
 
     if (fs.existsSync(filename)) {
-      screenKey = fs.readFileSync(filename, { encoding: "utf8" });
+      screenKey = fs.readFileSync(filename, { encoding: "utf8" }).trim();
       console.log(this.name + ": Found screen key: " + screenKey);
     } else {
       console.log(this.name + ": Generating new screen key file: ", filename);
@@ -147,9 +147,17 @@ module.exports = NodeHelper.create({
   },
 
   playBell: function () {
-    // exec("omxplayer " + this.path + "/newmessage.wav");
+    if (!isPi()) return;
     const playCommand = `${this.config.playMessageCommand} ${this.path}/${this.config.newMessageSound}`;
-    exec (playCommand);
+    console.log(this.name + ": Playing bell: " + playCommand);
+    exec(playCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error(this.name + ": Error playing bell: ", error.message);
+      }
+      if (stderr) {
+        console.error(this.name + ": Bell stderr: ", stderr);
+      }
+    });
   },
 
   openUrl: async function (url) {
