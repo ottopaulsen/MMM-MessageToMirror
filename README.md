@@ -21,23 +21,24 @@ Go to `MagicMirror/modules` and write
 This is the default configuration with description. Put it in the `MagicMirror/config/config.js`:
 
 ```json
-                {
-                	module: 'MMM-MessageToMirror',
-                    position: 'middle_center',
-                    disabled: false,
-                	config: {
-                        name: 'My Magic Mirror',
-                        database: 'database-name',
-                        functions: '<uri to functions>',
-                        screenKey: 'MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP', // MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP
-                        users: [
-                            {email: 'user1-email', name: 'User1 Name'},
-                            {email: 'user2-email', name: 'User2 Name'},
-                            {email: 'user3-email', name: 'User3 Name'}
-                        ],
-                        newMessageSound: 'newmessage.wav'
-                	}
-                },
+{
+  module: "MMM-MessageToMirror",
+  position: "middle_center",
+  disabled: false,
+  config: {
+    name: "My Magic Mirror",
+    database: "database-name",
+    functions: "<uri to functions>",
+    screenKey: "MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP", // MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP
+      users: [
+        {email: "user1-email", name: "User1 Name"},
+        {email: "user2-email", name: "User2 Name"},
+        {email: "user3-email", name: "User3 Name"}
+      ],
+    newMessageSound: "newmessage.wav",
+    playMessageCommand: "aplay -D plughw:0,0"
+  }
+},
 ```
 
 The `name` comes up in the app. You can use it to select between multiple mirrors.
@@ -50,7 +51,11 @@ The `screenKey` must be set to `MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_ST
 
 The `users` array contains email and display name for all users that are allowed to send messages to the mirror. Currently only Google accounts are supported.
 
-You may change the sound used for new messages by changing the newMessageSound file, provided you also add another sound file.
+You may change the sound used for new messages by changing the `newMessageSound` file, provided you also add another sound file.
+
+The `playMessageCommand` can be used to change how sound is played. The module tries to play in electron. If that works, set this to null. On a Raspberry Pi, electron will not play. Then try what OS command that can play the sound and put that OS copmmand here. Here are some to try:
+* omxplayer
+* aplay -D plughw:0,0
 
 See [magic-message](https://github.com/ottopaulsen/magic-message) for more details on the server and app code.
 

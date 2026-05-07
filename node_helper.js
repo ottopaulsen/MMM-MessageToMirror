@@ -147,8 +147,9 @@ module.exports = NodeHelper.create({
   },
 
   playBell: function () {
-    console.log("Playing bell");
-    exec("omxplayer " + this.path + "/newmessage.wav");
+    // exec("omxplayer " + this.path + "/newmessage.wav");
+    const playCommand = `${this.config.playMessageCommand} ${this.path}/${this.config.newMessageSound}`;
+    exec (playCommand);
   },
 
   openUrl: async function (url) {

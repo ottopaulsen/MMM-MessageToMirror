@@ -18,6 +18,7 @@ Module.register("MMM-MessageToMirror", {
     functions: "",
     users: [],
     newMessageSound: "newmessage.wav",
+    playMessageCommand: "aplay -D plughw:0,0",
     showSender: true,
     showTime: true,
     urlTimeoutSeconds: 3600,
@@ -95,14 +96,15 @@ Module.register("MMM-MessageToMirror", {
   },
 
   playSound: function (soundfile) {
-    // const sound = document.createElement("audio");
-    // sound.src = this.file(soundfile);
-    // sound.setAttribute("autoplay", true);
-    // sound.loop = false;
-    // sound.volume = 1.0;
-    // sound.play();
+    // This works on mac
+    const sound = document.createElement("audio");
+    sound.src = this.file(soundfile);
+    sound.setAttribute("autoplay", true);
+    sound.loop = false;
+    sound.volume = 1.0;
+    sound.play();
 
-    // Use node-helper to play sound
+    // Use node-helper to play sound. Works on RPi,
     this.sendSocketNotification("MESSAGETOMIRROR_BELL");
   },
 
