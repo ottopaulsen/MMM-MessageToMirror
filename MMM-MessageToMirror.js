@@ -32,6 +32,7 @@ Module.register("MMM-MessageToMirror", {
   start: function () {
     console.log(this.name + " started. Id: ", this.identifier);
     var self = this;
+    this.loaded = true;
     this.openMessageToMirrorConnection();
     setInterval(function () {
       self.updateDom();
@@ -47,7 +48,11 @@ Module.register("MMM-MessageToMirror", {
     this.messages = [];
     this.initialSnapshotLoaded = false;
 
-    isUrl = function (url) {
+    if (this.unsubscribeFirestore) {
+      this.unsubscribeFirestore();
+    }
+
+    const isUrl = function (url) {
       return url.startsWith("https:");
     };
 
@@ -56,19 +61,19 @@ Module.register("MMM-MessageToMirror", {
     var db = firebase.firestore();
 
     console.log(this.name + ": Getting data");
-    path = "screens/" + screenKey + "/messages";
-    db.collection(path)
+    const path = "screens/" + screenKey + "/messages";
+    this.unsubscribeFirestore = db.collection(path)
       .orderBy("sentTime", "desc")
       .onSnapshot((querySnapshot) => {
         self.messages = [];
         querySnapshot.forEach((doc) => {
-          sentTime = doc.data().sentTime.toDate();
-          validMinutes = Number(doc.data().validMinutes);
-          validTime =
+          const sentTime = doc.data().sentTime.toDate();
+          const validMinutes = Number(doc.data().validMinutes);
+          let validTime =
             sentTime.getTime() + validMinutes * 60 * 1000 - Date.now();
           validTime = validTime > 0 ? validTime : 0;
           if (validTime > 1000) {
-            url = doc.data().message;
+            const url = doc.data().message;
             console.log("URL: ", url);
             if (isUrl(url)) {
               // this.sendNotification('SWD_URL', { url: [url] })
@@ -112,21 +117,18 @@ Module.register("MMM-MessageToMirror", {
     sound.setAttribute("autoplay", true);
     sound.loop = false;
     sound.volume = 1.0;
-    sound.play();
+    sound.play().catch((err) => {
+      console.log(this.name + ": Could not play sound: " + err.message);
+    });
 
     // Use node-helper to play sound. Works on RPi,
     this.sendSocketNotification("MESSAGETOMIRROR_BELL");
   },
 
   removeOldMessages: function (self) {
-    self.messages.forEach((msg, i, arr) => {
-      if (
-        msg.sentTime.getTime() + msg.validMinutes * 60 * 1000 <=
-        Date.now() + 1000
-      ) {
-        arr.splice(i, 1);
-      }
-    });
+    self.messages = self.messages.filter(
+      (msg) => msg.sentTime.getTime() + msg.validMinutes * 60 * 1000 > Date.now() + 1000
+    );
     self.updateDom();
   },
 
@@ -171,9 +173,8 @@ Module.register("MMM-MessageToMirror", {
   getDom: function () {
     var wrapper = document.createElement("table");
     wrapper.className = "medium";
-    var first = true;
 
-    self = this;
+    const self = this;
 
     if (self.messages.length === 0) {
       wrapper.innerHTML = self.loaded ? self.translate("EMPTY") : "";

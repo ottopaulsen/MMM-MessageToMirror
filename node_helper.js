@@ -27,7 +27,7 @@ module.exports = NodeHelper.create({
 
   getScreenKey: function (config) {
     var path = this.path + "/keys";
-    var filename = path + "/" + config.name.replace(" ", "_") + ".key";
+    var filename = path + "/" + config.name.replace(/ /g, "_") + ".key";
 
     if (!fs.existsSync(path)) {
       console.log(
@@ -56,7 +56,7 @@ module.exports = NodeHelper.create({
 
     var screenKey = self.getScreenKey(config);
     if (screenKey) {
-      users = {};
+      const users = {};
       config.users.forEach((user) => {
         users[user.email.replace(/\./g, "+", "g")] = user.name;
       });
@@ -114,10 +114,10 @@ module.exports = NodeHelper.create({
       self.loaded = true;
       self.options = {};
     } else if (notification === "MESSAGETOMIRROR_SEND_RECEIPT") {
-      ref = payload;
+      const ref = payload;
       self.sendReceipt(ref);
     } else if (notification === "MESSAGETOMIRROR_URL") {
-      url = payload;
+      const url = payload;
       self.openUrl(url);
     } else if (notification === "MESSAGETOMIRROR_BELL") {
       self.playBell();
@@ -126,7 +126,7 @@ module.exports = NodeHelper.create({
 
   sendReceipt: function (path) {
     console.log("Sending receipt for ", path);
-    self = this;
+    const self = this;
     request(
       {
         headers: {
@@ -162,37 +162,6 @@ module.exports = NodeHelper.create({
 
   openUrl: async function (url) {
     console.log(this.name + ": Opening URL: ", url);
-    const self = this;
-    let switchCount = 0;
-
-    function closeBrowser() {
-      console.log(self.name + ": Closing browser window");
-      self.browserWindow.close();
-      scroller.setRotaryHandler(null);
-      scroller.setSwitchHandler(null);
-    }
-
-    function switchClicked() {
-      switchCount++;
-      if (switchCount === 3) {
-        closeBrowser();
-      }
-      setTimeout(() => {
-        switchCount = 0;
-      }, 3000);
-    }
-
-    function scroll(direction) {
-      self.browserWindow.webContents
-        .executeJavaScript(
-          "window.scrollBy(0, " + direction * 5 * self.config.scrollSpeed + ")",
-          true
-        )
-        .then(null)
-        .catch((error) => {
-          console.log(self.name + ": Scroll error: ", error);
-        });
-    }
 
     if (!this.browserWindow) {
       console.log(this.name + ": Opening new browser window");
@@ -203,11 +172,12 @@ module.exports = NodeHelper.create({
     }
 
     this.browserWindow.loadURL(url);
-    scroller.setRotaryHandler(scroll);
-    scroller.setSwitchHandler(switchClicked);
 
     const inactivityTimeout = this.config.urlTimeoutSeconds * 1000;
     clearTimeout(this.browserTimeout);
-    this.browserTimeout = setTimeout(closeBrowser, inactivityTimeout);
+    this.browserTimeout = setTimeout(() => {
+      console.log(this.name + ": Closing browser window");
+      this.browserWindow.close();
+    }, inactivityTimeout);
   }
 });
