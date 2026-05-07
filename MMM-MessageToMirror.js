@@ -45,6 +45,7 @@ Module.register("MMM-MessageToMirror", {
   startReceiving: function (screenKey) {
     var self = this;
     this.messages = [];
+    this.initialSnapshotLoaded = false;
 
     isUrl = function (url) {
       return url.startsWith("https:");
@@ -88,10 +89,18 @@ Module.register("MMM-MessageToMirror", {
             self.sendReceipt(doc.ref);
           }
         });
-        const hasNewMessages = querySnapshot.docChanges().some(
-          (change) => change.type === "added"
-        );
-        if (hasNewMessages) self.playSound(self.config.newMessageSound);
+        if (self.initialSnapshotLoaded) {
+          const hasNewValidMessages = querySnapshot.docChanges().some((change) => {
+            if (change.type !== "added") return false;
+            const data = change.doc.data();
+            const t = data.sentTime.toDate().getTime();
+            const validTime = t + Number(data.validMinutes) * 60 * 1000 - Date.now();
+            return validTime > 1000 && !isUrl(data.message);
+          });
+          if (hasNewValidMessages) self.playSound(self.config.newMessageSound);
+        } else {
+          self.initialSnapshotLoaded = true;
+        }
         self.updateDom(1000);
       });
   },
