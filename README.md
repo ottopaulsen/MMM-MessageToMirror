@@ -29,12 +29,11 @@ This is the default configuration with description. Put it in the `MagicMirror/c
     name: "My Magic Mirror",
     database: "database-name",
     functions: "<uri to functions>",
-    screenKey: "MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP", // MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP
-      users: [
-        {email: "user1-email", name: "User1 Name"},
-        {email: "user2-email", name: "User2 Name"},
-        {email: "user3-email", name: "User3 Name"}
-      ],
+    users: [
+      {email: "user1-email", name: "User1 Name"},
+      {email: "user2-email", name: "User2 Name"},
+      {email: "user3-email", name: "User3 Name"}
+    ],
     newMessageSound: "newmessage.wav",
     playMessageCommand: "aplay -D plughw:0,0"
   }
@@ -47,9 +46,29 @@ The `database` is the name of the Firestore database you are using.
 
 The `functions` is the URI to the server code.
 
-The `screenKey` must be set to `MMM-MessageToMirror-WILL_BE_REPLACED_AT_FIRST_STARTUP` before you start the first time. At startup, the screen is registered in the MagicMessage server, and given a unique key. The module will automatically update the config file with the key when it is created. On subsequent startups, the key will be reused, and the legal users will be updated on the server. Screens that are not used for some time may be deleted from the server.
-
 The `users` array contains email and display name for all users that are allowed to send messages to the mirror. Currently only Google accounts are supported.
+
+### Screen key
+
+Each mirror is identified on the server by a unique **screen key** (a UUID). You do **not** set this in `config.js`. Instead, the module manages it automatically:
+
+- On **first startup**, a UUID is generated and saved to a file:
+  `modules/MMM-MessageToMirror/keys/<mirror-name>.key`
+  (spaces in the mirror name are replaced with underscores)
+- On **subsequent startups**, the key is read from that file and reused. The list of allowed users is updated on the server at every startup.
+- Screens that are not used for some time may be deleted from the server.
+
+> **Note:** The `keys/` directory is not committed to git. Keep it safe — it is the identity of your mirror on the server.
+
+### Moving or copying the module to a new machine
+
+When you set up MagicMirror on a new machine, you must also copy the key file, otherwise the mirror will register as a brand-new screen and lose its identity (users in the app will no longer be able to find it by its old name, and any existing configuration pointing to the old key will stop working).
+
+Steps:
+
+1. Clone or copy the module as usual and run `npm install`.
+2. Copy the entire `keys/` directory from the old machine to `modules/MMM-MessageToMirror/keys/` on the new machine.
+3. Start MagicMirror — the existing key will be found and reused automatically.
 
 You may change the sound used for new messages by changing the `newMessageSound` file, provided you also add another sound file.
 
